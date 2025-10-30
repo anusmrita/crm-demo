@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Multi-Page Form Demo</title>
+    <!-- Load Tailwind CSS for simple, clean styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f7f7; }
+        /* Style for the active nav link */
+        .nav-active { @apply bg-indigo-100 text-indigo-700 font-semibold; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md p-4 sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-600">Simple Site Demo</h1>
+            <div id="nav-links" class="space-x-4">
+                <button id="nav-home" onclick="showPage('home')" class="nav-btn text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-lg transition duration-150">Home Page</button>
+                <button id="nav-contact" onclick="showPage('contact')" class="nav-btn text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-lg transition duration-150">Contact Us</button>
+                <button id="nav-enquiry" onclick="showPage('enquiry')" class="nav-btn text-white bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg transition duration-150">Enquiry Form</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-4xl mx-auto p-8 w-full">
+
+        <!-- HOME Page -->
+        <div id="home-page" class="page-content bg-white p-8 rounded-xl shadow-lg">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Welcome Home</h2>
+            <p class="text-lg text-gray-600 mb-6">This is the main landing page. Click the buttons above to navigate between the pages. Watch the URL change in your browser!</p>
+            <img src="https://placehold.co/800x200/4F46E5/FFFFFF?text=HOME+PAGE" alt="Home Page Graphic" class="rounded-lg mb-4 w-full">
+        </div>
+
+        <!-- CONTACT US Page -->
+        <div id="contact-page" class="page-content bg-white p-8 rounded-xl shadow-lg hidden">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Contact Us</h2>
+            <p class="text-lg text-gray-600 mb-6">Here is where we list our contact information, support details, and business hours.</p>
+            <div class="space-y-4 text-gray-700">
+                <p><span class="font-semibold">Email:</span> support@demosite.com</p>
+                <p><span class="font-semibold">Phone:</span> (555) 123-4567</p>
+            </div>
+        </div>
+
+        <!-- ENQUIRY Page (The form page) -->
+        <div id="enquiry-page" class="page-content bg-white p-8 rounded-xl shadow-lg hidden">
+            <h2 class="text-4xl font-bold text-indigo-600 mb-6">Enquiry Submission Form</h2>
+            <p class="text-lg text-gray-600 mb-6">This form meets the requirements for external CRM capture.</p>
+
+            <!-- *** CRITICAL FORM STRUCTURE *** -->
+            <form id="crm-enquiry-form" name="simple-form-name" class="space-y-4 p-6 bg-gray-50 rounded-lg border">
+                <div>
+                    <label for="full_name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                    <input type="text" id="full_name" name="full_name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email (Required Field)</label>
+                    <input type="email" id="email" name="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                </div>
+                <div>
+                    <label for="message" class="block text-sm font-medium text-gray-700">Your Message</label>
+                    <textarea id="message" name="message" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2"></textarea>
+                </div>
+                <!-- CRITICAL: Submit button type is "submit" -->
+                <input type="submit" value="Submit Enquiry" class="w-full py-2 px-4 rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 cursor-pointer">
+            </form>
+            <!-- *** END OF FORM *** -->
+
+            <div id="form-message" class="mt-4 text-center text-sm font-medium hidden"></div>
+        </div>
+
+    </main>
+
+    <!-- JavaScript for Page Switching -->
+    <script>
+        const pages = ['home', 'contact', 'enquiry'];
+
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.add('hidden');
+            });
+            // Remove active style from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('nav-active');
+            });
+
+            // Show the requested page
+            const targetPage = document.getElementById(pageId + '-page');
+            const targetNav = document.getElementById('nav-' + pageId);
+            
+            if (targetPage && targetNav) {
+                targetPage.classList.remove('hidden');
+                targetNav.classList.add('nav-active');
+                
+                // CRITICAL FOR DEMO: Change the URL hash to simulate page redirect/load
+                history.pushState(null, '', `#${pageId}`); 
+            }
+        }
+
+        // Initialize Form Submission Handler
+        document.getElementById('crm-enquiry-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const emailInput = e.target.querySelector('#email').value;
+            const messageDiv = document.getElementById('form-message');
+
+            // In a real scenario, the Freshsales tracking code detects this submit event.
+            
+            messageDiv.textContent = `SUCCESS! Form data for ${emailInput} captured. This data would now be sent to your Freshsales CRM.`;
+            messageDiv.classList.remove('hidden');
+            messageDiv.classList.add('text-green-600');
+            
+            // Optionally, clear the form after submission
+            e.target.reset();
+        });
+
+        // Initializer: Load the initial page on load
+        window.onload = function() {
+            const initialPage = window.location.hash.substring(1) || 'home';
+            showPage(initialPage);
+        };
+    </script>
+
+</body>
+</html>
